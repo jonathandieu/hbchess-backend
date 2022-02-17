@@ -8,7 +8,7 @@ app.get("/", (req, res) => {
 } );
 
 app.get("/testendpoint", (req, res) => {
-    res.json({ message : "Woooohooo we're setting stuff up AND our endpoint works!", status : 418 });
+    res.json({ message : "Woooohooo we're setting stuff up AND our endpoint works!", status : 418, testing : "TESTING!" });
 } );
 
 // Start express server
