@@ -1,13 +1,13 @@
 const express = require('express');
 const app = express();
-const port = 8080; // Default listening port
+const port = process.env.PORT || 8080; // Listening port defaults to 8080 if there's no env port
 
 // Define route handler for the default home page
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
     res.send("Woooohooo we're setting stuff up!");
 } );
 
-app.get("/testendpoint", (req, res) => {
+app.get("/api/testendpoint", (req, res) => {
     res.json({ message : "Woooohooo we're setting stuff up AND our endpoint works!", status : 418, testing : "TESTING!" });
 } );
 
