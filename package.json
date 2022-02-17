@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/jonathanhuydieu/mern-stack-backend/issues"
   },
-  "homepage": "https://github.com/jonathanhuydieu/mern-stack-backend#readme"
+  "homepage": "https://github.com/jonathanhuydieu/mern-stack-backend#readme",
+  "dependencies": {
+    "express": "^4.17.3",
+    "mongoose": "^6.2.2"
+  }
 }
