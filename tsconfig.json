@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "module": "commonjs", // Specifies module system to use in JS
+        "target": "es6", // Defines targeted JS version of code
+        "rootDir": "./", // defines the root location of TSX files
+        "esModuleInterop": true // Flag that enables default imports
+    }
+}
