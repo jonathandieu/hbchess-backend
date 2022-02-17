@@ -1,0 +1,19 @@
+{
+  "name": "mern-stack-backend",
+  "version": "1.0.0",
+  "description": "Backend express and node server for our mern-stack app",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jonathanhuydieu/mern-stack-backend.git"
+  },
+  "author": "Group 14",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jonathanhuydieu/mern-stack-backend/issues"
+  },
+  "homepage": "https://github.com/jonathanhuydieu/mern-stack-backend#readme"
+}
