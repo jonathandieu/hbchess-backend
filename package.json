@@ -4,6 +4,7 @@
   "description": "Backend express and node server for our mern-stack app",
   "main": "server.ts",
   "scripts": {
+    "tsc": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
