@@ -27,7 +27,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
     - run: npm i
-    - run: npm tsc
+    - run: npm run tsc #Compile Typescript files int Javascript
     - run: pm2 restart BackendAPI # restarts the backend service running on server
     # We don't have these yet
     # - run: npm run build --if-present
