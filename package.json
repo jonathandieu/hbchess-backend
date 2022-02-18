@@ -2,8 +2,9 @@
   "name": "mern-stack-backend",
   "version": "1.0.0",
   "description": "Backend express and node server for our mern-stack app",
-  "main": "server.js",
+  "main": "server.ts",
   "scripts": {
+    "tsc": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,5 +21,11 @@
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "mongoose": "^6.2.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^17.0.18",
+    "ts-node": "^10.5.0",
+    "typescript": "^4.5.5"
   }
 }
