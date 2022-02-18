@@ -1,10 +1,12 @@
 {
-    "compilerOptions": {
-        "module": "commonjs", // Specifies module system to use in JS
-        "target": "es6", // Defines targeted JS version of code
-        "rootDir": "./", // defines the root location of TSX files
-        "esModuleInterop": true, // Flag that enables default imports
-        "outDir": "build",
-        "declaration": true // Generate d.ts files
-    }
+  "compilerOptions": {
+    "module": "commonjs", // Specifies module system to use in JS
+    "target": "es6", // Defines targeted JS version of code
+    "rootDir": "./", // defines the root location of TSX files
+    "esModuleInterop": true, // Flag that enables default imports
+    "outDir": "build",
+    "strict": true,
+    "alwaysStrict": true,
+    "declaration": true // Generate d.ts files
+  }
 }
