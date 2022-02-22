@@ -5,8 +5,16 @@ const port = process.env.PORT || 8080; // Listening port defaults to 8080 if the
 // MongoDB Setup
 const MongoClient = require('mongodb').MongoClient;
 const ATLAS_URI = "mongodb+srv://main-cluster.bvdg5.mongodb.net/myFirstDatabase?authSource=%24external&authMechanism=MONGODB-X509&retryWrites=true&w=majority"; // DB URL
-const credentials = '' // Path to the credentials file
-const client = new MongoClient(ATLAS_URI);
+const credentials = "./secrets/X509-cert-9030528069491104300.pem"; // Path to the credentials file //? This is relative path from server.js in build
+
+// This is the secure certificate way to access the DB
+// const client = new MongoClient(ATLAS_URI, {
+//     sslKey: credentials,
+//     sslCert: credentials,
+//     // serverApi: ServerApiVersion.v1
+// });
+// This is the unsecure way with password hardcoded in
+const client = new MongoClient("mongodb+srv://<username>:<password>@main-cluster.bvdg5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
 client.connect();
 
 async function run() {
