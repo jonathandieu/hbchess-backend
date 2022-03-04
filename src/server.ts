@@ -2,6 +2,8 @@ import express from "express";
 const app = express();
 const port = process.env.PORT || 8080; // Listening port defaults to 8080 if there's no env port
 
+var User = require('./model/user');
+
 // Define route handler for the default home page
 app.get("/api", (req, res) => {
   res.send("Woooohooo we're setting stuff up!");
