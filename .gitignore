@@ -3,7 +3,28 @@ node_modules
 *.log
 *.gz
 
+# production
+/build
+
 # Repeat after me: We do NOT push Secrets to GitHub
 secrets/
 *.env
 *.pem
+
+# dependencies
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
