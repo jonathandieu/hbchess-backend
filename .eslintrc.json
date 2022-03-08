@@ -17,7 +17,7 @@
       "error",
       {},
       {
-        "usePrettierrc": false
+        "usePrettierrc": true
       }
     ],
     "@typescript-eslint/explicit-module-boundary-types": "off",
