@@ -2,12 +2,12 @@ import express from "express";
 import {
   loginUser,
   registerUser,
-  verifyEmail
+  verifyUser
 } from "../controllers/userController";
 const router = express.Router();
 
 router.post("/register", registerUser);
-router.post("/verifyEmail", verifyEmail);
+router.get("/verify-user", verifyUser);
 router.post("/login", loginUser);
 
 export default router;

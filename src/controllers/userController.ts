@@ -34,6 +34,9 @@ export const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
+    const host = `${process.env.PRODUCTION}`
+      ? `http://${req.hostname}`
+      : `http://${req.hostname}:${process.env.CLIENT_PORT || 3000}`;
     const msg = {
       to: user.email,
       from: `${process.env.SEND_GRID_SENDER}`,
@@ -41,12 +44,12 @@ export const registerUser = asyncHandler(async (req, res) => {
       text: `
         Thank you for registering ${user.username}.
         Please copy and paste the address below to verify your account.
-        http://${req.headers.host}/api/users/verify-email?emailToken=${user.emailToken}     
+        http://${host}/api/users/verify-email?emailToken=${user.emailToken}     
       `,
       html: `
         <h1> Thank you for registering ${user.username}.</h1>
         <p>Please click the link below to verify your account.</a>
-        <a href="http://${req.headers.host}/api/users/verify-email?emailToken=${user.emailToken}">Verify your account</a>
+        <a href="http://${host}/api/users/verify-email?emailToken=${user.emailToken}">Verify your account</a>
       `
     };
     sgMail.send(msg);
@@ -60,23 +63,22 @@ export const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
-export const verifyEmail = asyncHandler(async (req, res) => {
-  const { email, emailToken } = req.body;
-  const user: IUser | null = await User.findOne({ email });
+export const verifyUser = asyncHandler(async (req, res) => {
+  const { emailToken } = req.query;
+  const user: IUser | null = await User.findOne({ emailToken });
 
   if (user) {
-    if (user.emailToken === emailToken) {
-      const user = await User.findOneAndUpdate(email, { isVerified: true });
-      res.json({
-        token: generateToken(user._id, user.username, email)
-      });
-    } else {
-      res.status(400);
-      throw new Error("The provided token is incorrect");
-    }
+    user.emailToken = null;
+    user.isVerified = true;
+    await user.save();
+    res.redirect(
+      `${process.env.PRODUCTION}`
+        ? `http://${req.hostname}`
+        : `http://${req.hostname}:${process.env.CLIENT_PORT || 3000}`
+    );
   } else {
     res.status(400);
-    throw new Error("User does not exist");
+    throw new Error("The provided token is invalid");
   }
 });
 
