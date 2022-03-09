@@ -3,6 +3,10 @@ import bcrypt from "bcryptjs";
 import asyncHandler from "express-async-handler";
 import User, { IUser } from "../models/user";
 import mongoose from "mongoose";
+import crypto from "crypto";
+import sgMail from "@sendgrid/mail";
+
+sgMail.setApiKey(`${process.env.SEND_GRID_API_KEY}`);
 
 export const registerUser = asyncHandler(async (req, res) => {
   const { username, email, password } = req.body;
@@ -23,12 +27,30 @@ export const registerUser = asyncHandler(async (req, res) => {
   const hashedPassword = await bcrypt.hash(password, salt);
 
   const user: IUser = await User.create({
-    username,
     email,
-    password: hashedPassword
+    username,
+    password: hashedPassword,
+    emailToken: crypto.randomBytes(64).toString("hex")
   });
 
   if (user) {
+    const msg = {
+      to: user.email,
+      from: `${process.env.SEND_GRID_SENDER}`,
+      subject: `Thank you for registering ${user.username}`,
+      text: `
+        Thank you for registering ${user.username}.
+        Please copy and paste the address below to verify your account.
+        http://${req.headers.host}/api/users/verify-email?emailToken=${user.emailToken}     
+      `,
+      html: `
+        <h1> Thank you for registering ${user.username}.</h1>
+        <p>Please click the link below to verify your account.</a>
+        <a href="http://${req.headers.host}/api/users/verify-email?emailToken=${user.emailToken}">Verify your account</a>
+      `
+    };
+    sgMail.send(msg);
+
     res.status(201).json({
       token: generateToken(user._id, user.username, user.email)
     });
@@ -40,7 +62,6 @@ export const registerUser = asyncHandler(async (req, res) => {
 
 export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-
   const user: IUser | null = await User.findOne({ email });
 
   if (user && (await bcrypt.compare(password, user.password))) {
