@@ -10,6 +10,7 @@ const port = process.env.PORT || 8080; // Listening port defaults to 8080 if the
 
 connectDB();
 
+app.use(express.json());
 app.use("/api/users", userRoutes);
 
 // Start express server
