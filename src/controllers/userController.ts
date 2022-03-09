@@ -60,6 +60,26 @@ export const registerUser = asyncHandler(async (req, res) => {
   }
 });
 
+export const verifyEmail = asyncHandler(async (req, res) => {
+  const { email, emailToken } = req.body;
+  const user: IUser | null = await User.findOne({ email });
+
+  if (user) {
+    if (user.emailToken === emailToken) {
+      const user = await User.findOneAndUpdate(email, { isVerified: true });
+      res.json({
+        token: generateToken(user._id, user.username, email)
+      });
+    } else {
+      res.status(400);
+      throw new Error("The provided token is incorrect");
+    }
+  } else {
+    res.status(400);
+    throw new Error("User does not exist");
+  }
+});
+
 export const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   const user: IUser | null = await User.findOne({ email });
