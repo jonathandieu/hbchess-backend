@@ -15,8 +15,12 @@ const UserSchema = new Schema({
       "Please fill a valid email address"
     ]
   },
-  username: { type: String, required: true, trim: true, unique: true },
-  password: { type: String, required: true },
+  username: { type: String, trim: true, unique: true, required: true },
+  password: {
+    type: String,
+    required: true,
+    match: /^\$2[aby]?\$\d{1,2}\$[.\/A-Za-z0-9]{53}$/
+  },
   emailToken: { type: String, required: true },
   isVerified: { type: Boolean, default: false }
 });
