@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import isemail from "isemail";
 const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
@@ -7,8 +8,10 @@ const UserSchema = new Schema({
     trim: true,
     unique: true,
     required: [true, "Email address is required"],
-    match: [
-      /^.+@.+\..+$/,
+    validate: [
+      function(v: string) {
+        return isemail.validate(v);
+      },
       "Please fill a valid email address"
     ]
   },
