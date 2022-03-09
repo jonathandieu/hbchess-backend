@@ -5,6 +5,7 @@ import User, { IUser } from "../models/user";
 import mongoose from "mongoose";
 import crypto from "crypto";
 import sgMail from "@sendgrid/mail";
+import "dotenv/config";
 
 sgMail.setApiKey(`${process.env.SEND_GRID_API_KEY}`);
 
@@ -34,9 +35,12 @@ export const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
-    const host = `${process.env.PRODUCTION}`
-      ? `http://${req.hostname}`
-      : `http://${req.hostname}:${process.env.CLIENT_PORT || 3000}`;
+    const url =
+      process.env.NODE_ENV === "production"
+        ? `http://${req.hostname}/api/users/verify-user?emailToken=${user.emailToken}`
+        : `http://${req.hostname}:${
+            process.env.PORT || 8080
+          }/api/users/verify-user?emailToken=${user.emailToken}`;
     const msg = {
       to: user.email,
       from: `${process.env.SEND_GRID_SENDER}`,
@@ -44,12 +48,12 @@ export const registerUser = asyncHandler(async (req, res) => {
       text: `
         Thank you for registering ${user.username}.
         Please copy and paste the address below to verify your account.
-        http://${host}/api/users/verify-email?emailToken=${user.emailToken}     
+        ${url}     
       `,
       html: `
         <h1> Thank you for registering ${user.username}.</h1>
         <p>Please click the link below to verify your account.</a>
-        <a href="http://${host}/api/users/verify-email?emailToken=${user.emailToken}">Verify your account</a>
+        <a href="${url}">Verify your account</a>
       `
     };
     sgMail.send(msg);
@@ -68,11 +72,11 @@ export const verifyUser = asyncHandler(async (req, res) => {
   const user: IUser | null = await User.findOne({ emailToken });
 
   if (user) {
-    user.emailToken = null;
+    user.emailToken = "";
     user.isVerified = true;
     await user.save();
     res.redirect(
-      `${process.env.PRODUCTION}`
+      process.env.NODE_ENV === "production"
         ? `http://${req.hostname}`
         : `http://${req.hostname}:${process.env.CLIENT_PORT || 3000}`
     );
