@@ -19,4 +19,4 @@ const UserSchema = new Schema({
   isVerified: { type: Boolean, default: false }
 });
 
-module.exports = mongoose.model("User", UserSchema);
+export default mongoose.model("User", UserSchema);
