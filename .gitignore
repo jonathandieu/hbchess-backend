@@ -5,6 +5,7 @@ node_modules
 
 # production
 /build
+build/
 
 # Repeat after me: We do NOT push Secrets to GitHub
 secrets/
