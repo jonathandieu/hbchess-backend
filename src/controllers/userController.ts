@@ -59,7 +59,7 @@ export const registerUser = asyncHandler(async (req, res) => {
     sgMail.send(msg);
 
     res.status(201).json({
-      token: generateToken(user._id, user.username, user.email)
+      message: "Account Successfully Created"
     });
   } else {
     res.status(400);
