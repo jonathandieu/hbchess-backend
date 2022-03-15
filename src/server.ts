@@ -3,24 +3,15 @@
 import express from "express";
 const app = express();
 import "dotenv/config";
+import userRoutes from "./routes/userRoutes";
 
 import connectDB from "./db";
 const port = process.env.PORT || 8080; // Listening port defaults to 8080 if there's no env port
 
 connectDB();
 
-// Define route handler for the default home page
-app.get("/api", (req, res) => {
-  res.send("Woooohooo we're setting stuff up!");
-});
-
-app.get("/api/testendpoint", (req, res) => {
-  res.json({
-    message: "Woooohooo we're setting stuff up AND our endpoint works!",
-    status: 418,
-    testing: "TESTING! (With TypeScript & Automatic Deployment)"
-  });
-});
+app.use(express.json());
+app.use("/api/users", userRoutes);
 
 // Start express server
 app.listen(port, () => {

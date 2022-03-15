@@ -1,5 +1,13 @@
-import mongoose from "mongoose";
-const Schema = mongoose.Schema;
+import mongoose, { Schema, Document } from "mongoose";
+
+export interface IUser extends Document {
+  _id: mongoose.Types.ObjectId;
+  email: string;
+  username: string;
+  password: string;
+  emailToken: string | null;
+  isVerified: boolean;
+}
 
 const UserSchema = new Schema({
   email: {
@@ -13,10 +21,10 @@ const UserSchema = new Schema({
       "Please fill a valid email address"
     ]
   },
-  username: { type: String, required: true, unique: true, index: true },
+  username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  emailToken: { type: String, required: true, unique: true },
+  emailToken: { type: String },
   isVerified: { type: Boolean, default: false }
 });
 
-module.exports = mongoose.model("User", UserSchema);
+export default mongoose.model("User", UserSchema);
