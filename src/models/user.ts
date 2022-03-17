@@ -21,7 +21,7 @@ const UserSchema = new Schema({
     required: true,
     match: /^\$2[aby]?\$\d{1,2}\$[.\/A-Za-z0-9]{53}$/
   },
-  emailToken: { type: String, required: true },
+  emailToken: { type: String },
   isVerified: { type: Boolean, default: false }
 });
 
