@@ -1,26 +1,23 @@
 /* eslint-disable no-console */
 
 import express from "express";
+import cors from "cors";
+import { errorHandler } from "./middlewares/errorMiddleware";
 const app = express();
 import "dotenv/config";
+import userRoutes from "./routes/userRoutes";
 
 import connectDB from "./db";
 const port = process.env.PORT || 8080; // Listening port defaults to 8080 if there's no env port
 
 connectDB();
 
-// Define route handler for the default home page
-app.get("/api", (req, res) => {
-  res.send("Woooohooo we're setting stuff up!");
-});
+app.use(cors());
+app.use(express.json());
 
-app.get("/api/testendpoint", (req, res) => {
-  res.json({
-    message: "Woooohooo we're setting stuff up AND our endpoint works!",
-    status: 418,
-    testing: "TESTING! (With TypeScript & Automatic Deployment)"
-  });
-});
+app.use("/api/users", userRoutes);
+
+app.use(errorHandler);
 
 // Start express server
 app.listen(port, () => {

@@ -1,6 +1,14 @@
-import mongoose from "mongoose";
 import isemail from "isemail";
-const Schema = mongoose.Schema;
+import mongoose, { Schema, Document } from "mongoose";
+
+export interface IUser extends Document {
+  _id: mongoose.Types.ObjectId;
+  email: string;
+  username: string;
+  password: string;
+  emailToken: string | null;
+  isVerified: boolean;
+}
 
 const UserSchema = new Schema({
   email: {
@@ -9,7 +17,7 @@ const UserSchema = new Schema({
     unique: true,
     required: [true, "Email address is required"],
     validate: [
-      function(v: string) {
+      function (v: string) {
         return isemail.validate(v);
       },
       "Please fill a valid email address"
@@ -19,10 +27,10 @@ const UserSchema = new Schema({
   password: {
     type: String,
     required: true,
-    match: /^\$2[aby]?\$\d{1,2}\$[.\/A-Za-z0-9]{53}$/
+    match: /^\$2[aby]?\$\d{1,2}\$[./A-Za-z0-9]{53}$/
   },
   emailToken: { type: String },
   isVerified: { type: Boolean, default: false }
 });
 
-module.exports = mongoose.model("User", UserSchema);
+export default mongoose.model("User", UserSchema);
