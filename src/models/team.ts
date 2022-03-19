@@ -1,5 +1,4 @@
-import mongoose from "mongoose";
-const Schema = mongoose.Schema;
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface ITeam extends Document {
   _id: mongoose.Types.ObjectId;
@@ -9,14 +8,14 @@ export interface ITeam extends Document {
 }
 
 const TeamSchema = new Schema({
-  sender: { type: Schema.Types.ObjectId, ref: "User", required: true},
+  sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
   recipient: {
     type: Schema.Types.ObjectId,
     ref: "User",
     required: true,
     validate: [
-      function(this: ITeam, v: mongoose.Types.ObjectId) {
-        return this.sender != v;
+      function (this: ITeam, v: mongoose.Types.ObjectId) {
+        return this.sender !== v;
       },
       "Please fill a valid email address"
     ]
@@ -27,4 +26,4 @@ const TeamSchema = new Schema({
 TeamSchema.index({ sender: 1, recipient: 1 }, { unique: true });
 TeamSchema.index({ recipient: 1, sender: 1 }, { unique: true });
 
-module.exports = mongoose.model("Team", TeamSchema);
+export default mongoose.model("Team", TeamSchema);
