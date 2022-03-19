@@ -24,6 +24,13 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw new Error("User already exists");
   }
 
+  const usernameExists = await User.findOne({ username });
+
+  if (usernameExists) {
+    res.status(400);
+    throw new Error("Username taken");
+  }
+
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -103,6 +110,16 @@ export const loginUser = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Invalid credentials");
   }
+});
+
+export const getUser = asyncHandler(async (req, res) => {
+  res.json(req.user);
+});
+
+export const searchUser = asyncHandler(async (req, res) => {
+  const { search } = req.body;
+  const results = await User.find({ username: search }).select("username");
+  res.json(results);
 });
 
 const generateToken = (
