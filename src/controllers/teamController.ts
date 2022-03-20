@@ -20,20 +20,24 @@ export const createTeam = asyncHandler(
           senderU,
           recieverU
         });
-        if (!teamExists) {
-          const team: ITeam = new Team({
-            sender: sender._id,
-            recipient: recipient._id
-          });
 
-          const err = team.validateSync();
-          if (err) {
-            res.status(400);
-            const message = err.toString().split(":")[2].trim();
-            throw new Error(message);
-          } else {
-            await team.save();
-          }
+        if (teamExists && teamExists.accepted === false) {
+          res.status(400);
+          throw new Error("Friend request still pending");
+        }
+
+        const team: ITeam = new Team({
+          sender: sender._id,
+          recipient: recipient._id
+        });
+
+        const err = team.validateSync();
+        if (err) {
+          res.status(400);
+          const message = err.toString().split(":")[2].trim();
+          throw new Error(message);
+        } else {
+          await team.save();
         }
       } else {
         res.status(400);

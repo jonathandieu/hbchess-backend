@@ -133,7 +133,9 @@ export const getUser = asyncHandler(
 
 export const searchUser = asyncHandler(async (req: Request, res: Response) => {
   const { search } = req.body;
-  const results = await User.find({ username: search }).select("username");
+  const results = await User.find({
+    username: { $regex: search, $options: "i" }
+  }).select("username -_id");
   res.json(results);
 });
 
