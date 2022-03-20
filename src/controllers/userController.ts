@@ -37,8 +37,8 @@ export const registerUser = asyncHandler(async (req, res) => {
   if (user) {
     const url =
       process.env.NODE_ENV === "production"
-        ? `http://${req.hostname}/api/users/verify-user?emailToken=${user.emailToken}`
-        : `http://${req.hostname}:${
+        ? `https://hbchess.app/api/users/verify-user?emailToken=${user.emailToken}`
+        : `http://localhost:${
             process.env.PORT || 8080
           }/api/users/verify-user?emailToken=${user.emailToken}`;
     const msg = {
@@ -77,8 +77,8 @@ export const verifyUser = asyncHandler(async (req, res) => {
     await user.save();
     res.redirect(
       process.env.NODE_ENV === "production"
-        ? `http://${req.hostname}`
-        : `http://${req.hostname}:${process.env.CLIENT_PORT || 3000}`
+        ? `https://hbchess.app/auth/login`
+        : `http://localhost:${process.env.CLIENT_PORT || 3000}`
     );
   } else {
     res.status(400);
