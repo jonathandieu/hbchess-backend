@@ -1,11 +1,12 @@
 import express from "express";
-import { createTeam, getTeam } from "../controllers/teamController";
+import { createTeam, getTeam, acceptTeam } from "../controllers/teamController";
 
 import { protect } from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
 router.post("/create", protect, createTeam);
-router.post("/get", getTeam);
+router.get("/get", getTeam);
+router.put("/accept", protect, acceptTeam);
 
 export default router;
