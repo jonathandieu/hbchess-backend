@@ -43,11 +43,6 @@ export const createTeam = asyncHandler(
       res.status(401);
       throw new Error("Invalid token");
     }
-    // Send me either my_id and the other persons username
-    // checkning for an error for the save operation.
-
-    // search api for getting id
-    // sender.id and a reciever.id
   }
 );
 
