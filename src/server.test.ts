@@ -1,0 +1,24 @@
+import request from "supertest";
+import app from "./server";
+
+describe("POST /users/login", () => {
+  describe("given an email and password", () => {
+    test("should respond with a 400 status code", async () => {
+      const response = await request(app).post("/users/login").send({
+        email: "email@gmail.com",
+        password: "password"
+      });
+      expect(response.statusCode).toBe(400);
+    });
+  });
+
+  describe("when the username and password is missing", () => {
+    test("should respond with a status code of 400", async () => {
+      const bodyData = [{ email: "email" }, { password: "password" }, {}];
+      for (const body of bodyData) {
+        const response = await request(app).post("/users/login").send(body);
+        expect(response.statusCode).toBe(400);
+      }
+    });
+  });
+});
