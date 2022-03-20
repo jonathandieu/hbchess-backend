@@ -20,19 +20,28 @@ export const registerUser = asyncHandler(async (req, res) => {
   const userExists = await User.findOne({ email });
 
   if (userExists) {
-    res.status(400);
+    res.status(409);
     throw new Error("User already exists");
   }
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  const user: IUser = await User.create({
+  const user: IUser = new User({
     email,
     username,
     password: hashedPassword,
     emailToken: crypto.randomBytes(64).toString("hex")
   });
+
+  const err = user.validateSync();
+  if (err) {
+    res.status(400);
+    const message = err.toString().split(":")[2].trim();
+    throw new Error(message);
+  } else {
+    await user.save();
+  }
 
   if (user) {
     const url =
