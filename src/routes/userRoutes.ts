@@ -13,6 +13,5 @@ router.post("/register", registerUser);
 router.get("/verify-user", verifyUser);
 router.post("/login", loginUser);
 router.get("/user", protect, getUser);
-router.get("/search", getUser);
 
 export default router;
