@@ -20,25 +20,34 @@ export const registerUser = asyncHandler(async (req, res) => {
   const userExists = await User.findOne({ email });
 
   if (userExists) {
-    res.status(400);
+    res.status(409);
     throw new Error("User already exists");
   }
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  const user: IUser = await User.create({
+  const user: IUser = new User({
     email,
     username,
     password: hashedPassword,
     emailToken: crypto.randomBytes(64).toString("hex")
   });
 
+  const err = user.validateSync();
+  if (err) {
+    res.status(400);
+    const message = err.toString().split(":")[2].trim();
+    throw new Error(message);
+  } else {
+    await user.save();
+  }
+
   if (user) {
     const url =
       process.env.NODE_ENV === "production"
-        ? `http://${req.hostname}/api/users/verify-user?emailToken=${user.emailToken}`
-        : `http://${req.hostname}:${
+        ? `https://hbchess.app/api/users/verify-user?emailToken=${user.emailToken}`
+        : `http://localhost:${
             process.env.PORT || 8080
           }/api/users/verify-user?emailToken=${user.emailToken}`;
     const msg = {
@@ -77,8 +86,8 @@ export const verifyUser = asyncHandler(async (req, res) => {
     await user.save();
     res.redirect(
       process.env.NODE_ENV === "production"
-        ? `http://${req.hostname}`
-        : `http://${req.hostname}:${process.env.CLIENT_PORT || 3000}`
+        ? `https://hbchess.app/auth/login`
+        : `http://localhost:${process.env.CLIENT_PORT || 3000}`
     );
   } else {
     res.status(400);
