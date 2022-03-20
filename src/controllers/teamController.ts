@@ -49,6 +49,8 @@ export const createTeam = asyncHandler(
       res.status(401);
       throw new Error("Invalid token");
     }
+
+    res.status(200);
   }
 );
 
@@ -95,6 +97,7 @@ export const acceptTeam = asyncHandler(
       res.status(401);
       throw new Error("Invalid token");
     }
+    res.status(200);
   }
 );
 
