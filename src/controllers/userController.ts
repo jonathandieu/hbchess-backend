@@ -17,11 +17,13 @@ export const registerUser = asyncHandler(async (req, res) => {
     throw new Error("Please add all fields");
   }
 
-  const userExists = await User.findOne({ email });
+  const userExists = await User.findOne({
+    $or: [{ username }, { email }]
+  });
 
   if (userExists) {
     res.status(409);
-    throw new Error("User already exists");
+    throw new Error("Username or email already exists");
   }
 
   const salt = await bcrypt.genSalt(10);
