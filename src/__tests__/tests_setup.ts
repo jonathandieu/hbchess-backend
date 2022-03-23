@@ -25,6 +25,7 @@ async function dropAllCollections() {
           error.message.includes("a background operation is currently running")
         )
           return;
+        // eslint-disable-next-line no-console
         console.log(error.message);
       }
     }
