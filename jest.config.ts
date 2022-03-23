@@ -6,6 +6,7 @@ const config: Config.InitialOptions = {
     "^.+\\.ts?$": "ts-jest"
   },
   roots: ["./src/__tests__"],
-  testPathIgnorePatterns: ["./src/__tests__/tests_setup.ts"]
+  testPathIgnorePatterns: ["./src/__tests__/tests_setup.ts"],
+  coveragePathIgnorePatterns: ["./src/__tests__/tests_setup.ts"]
 };
 export default config;
