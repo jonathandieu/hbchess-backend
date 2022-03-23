@@ -9,7 +9,8 @@
     "start": "concurrently \"npm run tsc-w\" \"nodemon ./build/src/server.js\" ",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
-    "test": "npx jest --detectOpenHandles",
+    "test": "npm run lint && npm run jest",
+    "jest": "jest --coverage --config \"./jest.config.ts\"",
     "prepare": "husky install"
   },
   "repository": {
@@ -30,7 +31,8 @@
     "express": "^4.17.3",
     "express-async-handler": "^1.2.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.2.4"
+    "mongoose": "^6.2.4",
+    "ts-jest": "^27.1.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
