@@ -20,12 +20,14 @@ export const registerUser = asyncHandler(
       throw new Error("Please add all fields");
     }
 
-    const userExists = await User.findOne({ email });
+  const userExists = await User.findOne({
+    $or: [{ username }, { email }]
+  });
 
-    if (userExists) {
-      res.status(409);
-      throw new Error("User already exists");
-    }
+  if (userExists) {
+    res.status(409);
+    throw new Error("Username or email already exists");
+  }
 
     const usernameExists = await User.findOne({ username });
 
