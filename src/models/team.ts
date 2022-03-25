@@ -14,8 +14,8 @@ const TeamSchema = new Schema({
     ref: "User",
     required: true,
     validate: [
-      function (this: ITeam, v: mongoose.Types.ObjectId) {
-        const existing = this.constructor().findOne({ recipient: v, sender: this.recipient });
+      function (this: ITeam, value: mongoose.Types.ObjectId) {
+        const existing = this.constructor().findOne({ recipient: value, sender: this.recipient });
         return !existing || existing._id === this._id
       },
       "Recipient has already sent a request to sender"
@@ -26,8 +26,8 @@ const TeamSchema = new Schema({
     ref: "User",
     required: true,
     validate: [
-      function (this: ITeam, v: mongoose.Types.ObjectId) {
-        return this.sender !== v;
+      function (this: ITeam, value: mongoose.Types.ObjectId) {
+        return this.sender !== value;
       },
       "Cannot request friendship with self"
     ]
