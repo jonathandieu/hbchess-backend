@@ -9,7 +9,18 @@ export interface ITeam extends Document {
 }
 
 const TeamSchema = new Schema({
-  sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  sender: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+    validate: [
+      function (this: ITeam, v: mongoose.Types.ObjectId) {
+        const existing = this.constructor().findOne({ recipient: v, sender: this.recipient });
+        return !existing || existing._id === this._id
+      },
+      "Recipient has already sent a request to sender"
+    ]
+  },
   recipient: {
     type: Schema.Types.ObjectId,
     ref: "User",
@@ -18,7 +29,7 @@ const TeamSchema = new Schema({
       function (this: ITeam, v: mongoose.Types.ObjectId) {
         return this.sender !== v;
       },
-      "Please fill a valid email address"
+      "Cannot request friendship with self"
     ]
   },
   accepted: { type: Boolean, required: true, default: false }
