@@ -11,9 +11,9 @@ import { protect } from "../middlewares/authMiddleware";
 const router = express.Router();
 
 router.post("/register", registerUser);
-router.get("/verify-user", verifyUser);
+router.get("/verify-user", protect, verifyUser);
 router.post("/login", loginUser);
 router.get("/user", protect, getUser);
-router.get("/search", searchUser);
+router.get("/search", protect, searchUser);
 
 export default router;

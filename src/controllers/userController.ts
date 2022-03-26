@@ -20,14 +20,14 @@ export const registerUser = asyncHandler(
       throw new Error("Please add all fields");
     }
 
-  const userExists = await User.findOne({
-    $or: [{ username }, { email }]
-  });
+    const userExists = await User.findOne({
+      $or: [{ username }, { email }]
+    });
 
-  if (userExists) {
-    res.status(409);
-    throw new Error("Username or email already exists");
-  }
+    if (userExists) {
+      res.status(409);
+      throw new Error("Username or email already exists");
+    }
 
     const usernameExists = await User.findOne({ username });
 
@@ -89,24 +89,26 @@ export const registerUser = asyncHandler(
   }
 );
 
-export const verifyUser = asyncHandler(async (req: Request, res: Response) => {
-  const { emailToken } = req.query;
-  const user: IUser | null = await User.findOne({ emailToken });
+export const verifyUser = asyncHandler(
+  async (req: RequestWithUser, res: Response) => {
+    const { emailToken } = req.query;
+    const user: IUser | null = await User.findOne({ emailToken });
 
-  if (user) {
-    user.emailToken = "";
-    user.isVerified = true;
-    await user.save();
-    res.redirect(
-      process.env.NODE_ENV === "production"
-        ? `https://hbchess.app/auth/login`
-        : `http://localhost:${process.env.CLIENT_PORT || 3000}`
-    );
-  } else {
-    res.status(400);
-    throw new Error("The provided token is invalid");
+    if (user) {
+      user.emailToken = "";
+      user.isVerified = true;
+      await user.save();
+      res.redirect(
+        process.env.NODE_ENV === "production"
+          ? `https://hbchess.app/auth/login`
+          : `http://localhost:${process.env.CLIENT_PORT || 3000}`
+      );
+    } else {
+      res.status(400);
+      throw new Error("The provided token is invalid");
+    }
   }
-});
+);
 
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
@@ -129,17 +131,26 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
 export const getUser = asyncHandler(
   async (req: RequestWithUser, res: Response) => {
-    res.json(req.user);
+    res.json({ user: req.user });
   }
 );
 
-export const searchUser = asyncHandler(async (req: Request, res: Response) => {
-  const { search } = req.body;
-  const results = await User.find({
-    username: { $regex: search, $options: "i" }
-  }).select("username -_id");
-  res.json(results);
-});
+export const searchUser = asyncHandler(
+  async (req: RequestWithUser, res: Response) => {
+    const { search } = req.query;
+    const { user } = req;
+
+    if (user) {
+      const { username } = user;
+      const results = await User.find({
+        username: { $regex: search, $options: "i", $nin: username }
+      })
+        .select("username -_id")
+        .limit(5);
+      res.status(200).json({ results });
+    }
+  }
+);
 
 const generateToken = (
   id: mongoose.Types.ObjectId,

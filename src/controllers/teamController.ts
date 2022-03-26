@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import e, { Request, Response } from "express";
 import { RequestWithUser } from "../middlewares/authMiddleware";
 import asyncHandler from "express-async-handler";
 import User, { IUser } from "../models/user";
@@ -30,7 +30,9 @@ export const createTeam = asyncHandler(
 
         const team: ITeam = new Team({
           sender: sender._id,
-          recipient: recipient._id
+          recipient: recipient._id,
+          senderUsername: sender.username,
+          recipientUsername: recipient.username
         });
 
         const err = team.validateSync();
@@ -50,7 +52,36 @@ export const createTeam = asyncHandler(
       throw new Error("Invalid token");
     }
 
-    res.status(200);
+    res.status(201).json();
+  }
+);
+
+export const getTeam = asyncHandler(
+  async (req: RequestWithUser, res: Response) => {
+    const { user } = req;
+
+    if (user) {
+      const { id } = user;
+
+      const team = await Team.find({
+        $or: [{ sender: id }, { recipient: id }],
+        accepted: true
+      });
+
+      const teamNot = await Team.find({
+        $or: [{ sender: id }, { recipient: id }],
+        accepted: false
+      });
+
+      if (team || teamNot) {
+        res.status(200).json({ team, teamNot });
+      } else {
+        res.status(204).json();
+      }
+    } else {
+      res.status(401);
+      throw new Error("Invalid Token");
+    }
   }
 );
 
@@ -70,12 +101,12 @@ export const acceptTeam = asyncHandler(
         });
 
         if (!team) {
-          res.status(400);
+          res.status(409);
           throw new Error("Team request revoked");
         }
 
         if (team.accepted === true) {
-          res.status(400);
+          res.status(409);
           throw new Error("Already a team");
         }
 
@@ -90,37 +121,13 @@ export const acceptTeam = asyncHandler(
           await team.save();
         }
       } else {
-        res.status(400);
+        res.status(404);
         throw new Error("Username doesn't exist");
       }
     } else {
       res.status(401);
       throw new Error("Invalid token");
     }
-    res.status(200);
+    res.status(200).json();
   }
 );
-
-export const getTeam = asyncHandler(async (req: Request, res: Response) => {
-  const { senderU, recipientU } = req.body;
-
-  const sender: IUser | null = await User.findOne({ senderU });
-  const recipient: IUser | null = await User.findOne({ recipientU });
-
-  const sid = sender?._id;
-  const rid = recipient?._id;
-
-  const team: ITeam | null = await Team.findOne({ sid, rid }).select("-_id");
-
-  if (team) {
-    if (team.accepted === true) {
-      res.json(team);
-    } else {
-      res.status(400);
-      throw new Error("Team request not accepted");
-    }
-  } else {
-    res.status(400);
-    throw new Error("Team not found");
-  }
-});

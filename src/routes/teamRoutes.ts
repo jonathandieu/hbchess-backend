@@ -6,7 +6,7 @@ import { protect } from "../middlewares/authMiddleware";
 const router = express.Router();
 
 router.post("/create", protect, createTeam);
-router.get("/get", getTeam);
+router.get("/get", protect, getTeam);
 router.put("/accept", protect, acceptTeam);
 
 export default router;

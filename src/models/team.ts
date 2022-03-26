@@ -1,4 +1,3 @@
-
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ITeam extends Document {
@@ -21,6 +20,8 @@ const TeamSchema = new Schema({
       "Please fill a valid email address"
     ]
   },
+  senderUsername: { type: Schema.Types.String, ref: "User", required: true },
+  recipientUsername: { type: Schema.Types.String, ref: "User", required: true },
   accepted: { type: Boolean, required: true, default: false }
 });
 
