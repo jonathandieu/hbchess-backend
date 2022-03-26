@@ -1,5 +1,4 @@
-import mongoose from "mongoose";
-const Schema = mongoose.Schema;
+import mongoose, { Schema, Document } from "mongoose";
 
 export interface ITeam extends Document {
   _id: mongoose.Types.ObjectId;
@@ -21,10 +20,12 @@ const TeamSchema = new Schema({
       "Please fill a valid email address"
     ]
   },
+  senderUsername: { type: Schema.Types.String, ref: "User", required: true },
+  recipientUsername: { type: Schema.Types.String, ref: "User", required: true },
   accepted: { type: Boolean, required: true, default: false }
 });
 
 TeamSchema.index({ sender: 1, recipient: 1 }, { unique: true });
 TeamSchema.index({ recipient: 1, sender: 1 }, { unique: true });
 
-export default module.exports = mongoose.model("Team", TeamSchema);
+export default mongoose.model("Team", TeamSchema);
