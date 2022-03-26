@@ -19,12 +19,12 @@ export const createTeam = asyncHandler(
         });
 
         if (teamExists && teamExists.accepted === false) {
-          res.status(400);
+          res.status(409);
           throw new Error("Team request still pending");
         }
 
         if (teamExists && teamExists.accepted === true) {
-          res.status(400);
+          res.status(409);
           throw new Error("Team already exists");
         }
 
@@ -44,7 +44,7 @@ export const createTeam = asyncHandler(
           await team.save();
         }
       } else {
-        res.status(400);
+        res.status(404);
         throw new Error("Username doesn't exist");
       }
     } else {
@@ -131,3 +131,20 @@ export const acceptTeam = asyncHandler(
     res.status(200).json();
   }
 );
+
+export const allTeam = asyncHandler(async (req: Request, res: Response) => {
+  const { limit, offset } = req.query;
+
+  if (limit !== undefined && offset !== undefined) {
+    const team = await Team.find({ accepted: true })
+      .sort({ wins: "desc" })
+      .skip(+offset)
+      .limit(+limit);
+
+    if (team) res.status(200).json(team);
+    else res.status(204).json();
+  } else {
+    res.status(400);
+    throw new Error("Provide limit and/or offset");
+  }
+});

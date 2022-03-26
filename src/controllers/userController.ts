@@ -29,13 +29,6 @@ export const registerUser = asyncHandler(
       throw new Error("Username or email already exists");
     }
 
-    const usernameExists = await User.findOne({ username });
-
-    if (usernameExists) {
-      res.status(400);
-      throw new Error("Username taken");
-    }
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 

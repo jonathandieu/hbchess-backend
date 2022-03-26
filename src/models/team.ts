@@ -22,6 +22,10 @@ const TeamSchema = new Schema({
   },
   senderUsername: { type: Schema.Types.String, ref: "User", required: true },
   recipientUsername: { type: Schema.Types.String, ref: "User", required: true },
+  matches: { type: Number, required: true, default: 0 },
+  wins: { type: Number, required: true, default: 0 },
+  losses: { type: Number, required: true, default: 0 },
+  name: { type: String, required: true, default: "Everything is Team Name" },
   accepted: { type: Boolean, required: true, default: false }
 });
 
