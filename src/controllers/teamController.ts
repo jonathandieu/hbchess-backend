@@ -1,4 +1,4 @@
-import e, { Request, Response } from "express";
+import { Request, Response } from "express";
 import { RequestWithUser } from "../middlewares/authMiddleware";
 import asyncHandler from "express-async-handler";
 import User, { IUser } from "../models/user";
@@ -14,8 +14,10 @@ export const createTeam = asyncHandler(
 
       if (recipient) {
         const teamExists: ITeam | null = await Team.findOne({
-          sender: sender._id,
-          recipient: recipient._id
+          $or: [
+            { sender: sender._id, recipient: recipient._id },
+            { sender: recipient._id, recipient: sender._id }
+          ]
         });
 
         if (teamExists && teamExists.accepted === false) {
