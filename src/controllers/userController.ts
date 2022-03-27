@@ -29,13 +29,6 @@ export const registerUser = asyncHandler(
       throw new Error("Username or email already exists");
     }
 
-    const usernameExists = await User.findOne({ username });
-
-    if (usernameExists) {
-      res.status(400);
-      throw new Error("Username taken");
-    }
-
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -145,7 +138,7 @@ export const searchUser = asyncHandler(
       const results = await User.find({
         username: { $regex: search, $options: "i", $nin: username }
       })
-        .select("username -_id")
+        .select("username _id")
         .limit(5);
       res.status(200).json({ results });
     }
