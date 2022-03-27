@@ -62,7 +62,7 @@ export const registerUser = asyncHandler(
         text: `
         Thank you for registering ${user.username}.
         Please copy and paste the address below to verify your account.
-        ${url}     
+        ${url}
       `,
         html: `
         <h1> Thank you for registering ${user.username}.</h1>
