@@ -1,8 +1,13 @@
+import { createServer } from "http";
+import socket from "./socket/index";
 import express from "express";
 import cors from "cors";
 import { errorHandler } from "./middlewares/errorMiddleware";
-const app = express();
-import "dotenv/config";
+
+export const app = express();
+export const httpServer = createServer(app);
+socket(httpServer);
+
 import userRoutes from "./routes/userRoutes";
 import teamRoutes from "./routes/teamRoutes";
 
@@ -13,5 +18,3 @@ app.use("/api/users", userRoutes);
 app.use("/api/teams", teamRoutes);
 
 app.use(errorHandler);
-
-export default app;

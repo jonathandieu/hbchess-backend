@@ -1,5 +1,5 @@
 import request from "supertest";
-import app from "../setUpServer";
+import { app } from "../setUpServer";
 import { setupDB } from "./tests_setup";
 
 setupDB();

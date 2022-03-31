@@ -15,10 +15,7 @@ export const protect = asyncHandler(
       try {
         token = req.headers.authorization;
 
-        const decoded: JwtPayload | string = jwt.verify(
-          token,
-          `${process.env.JWT_SECRET}`
-        );
+        const decoded: JwtPayload | string = verifyToken(token);
 
         if (!(typeof decoded === "string")) {
           req.user = await User.findById(decoded.id).select("-password");
@@ -39,3 +36,8 @@ export const protect = asyncHandler(
     }
   }
 );
+
+export const verifyToken = (token: string) => {
+  const decoded = jwt.verify(token, `${process.env.JWT_SECRET}`);
+  return decoded;
+};
