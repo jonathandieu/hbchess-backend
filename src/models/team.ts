@@ -7,7 +7,7 @@ export interface ITeam extends Document {
   accepted: boolean;
 }
 
-const TeamSchema = new Schema({
+export const TeamSchema = new Schema({
   sender: { type: Schema.Types.ObjectId, ref: "User", required: true },
   recipient: {
     type: Schema.Types.ObjectId,
