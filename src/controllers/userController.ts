@@ -82,30 +82,30 @@ export const registerUser = asyncHandler(
   }
 );
 
-export const verifyUser = asyncHandler(
-  async (req: RequestWithUser, res: Response) => {
-    const { emailToken } = req.query;
-    const user: IUser | null = await User.findOne({ emailToken });
+export const verifyUser = asyncHandler(async (req: Request, res: Response) => {
+  const { emailToken } = req.query;
+  const user: IUser | null = await User.findOne({ emailToken });
 
-    if (user) {
-      user.emailToken = "";
-      user.isVerified = true;
-      await user.save();
-      res.redirect(
-        process.env.NODE_ENV === "production"
-          ? `https://hbchess.app/auth/login`
-          : `http://localhost:${process.env.CLIENT_PORT || 3000}`
-      );
-    } else {
-      res.status(400);
-      throw new Error("The provided token is invalid");
-    }
+  if (user) {
+    user.emailToken = "";
+    user.isVerified = true;
+    await user.save();
+    res.redirect(
+      process.env.NODE_ENV === "production"
+        ? `https://hbchess.app/auth/login`
+        : `http://localhost:${process.env.CLIENT_PORT || 3000}`
+    );
+  } else {
+    res.status(400);
+    throw new Error("The provided token is invalid");
   }
-);
+});
 
 export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const user: IUser | null = await User.findOne({ email });
+  const user: IUser | null = await User.findOne({
+    $or: [{ username: email }, { email }]
+  });
 
   if (user && (await bcrypt.compare(password, user.password))) {
     if (user.isVerified) {
@@ -124,7 +124,11 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
 export const getUser = asyncHandler(
   async (req: RequestWithUser, res: Response) => {
-    res.json({ user: req.user });
+    const { user } = req;
+
+    if (user) user.password = "";
+
+    res.json({ user });
   }
 );
 

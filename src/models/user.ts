@@ -10,7 +10,7 @@ export interface IUser extends Document {
   isVerified: boolean;
 }
 
-const UserSchema = new Schema({
+export const UserSchema = new Schema({
   email: {
     type: String,
     trim: true,

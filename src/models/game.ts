@@ -3,13 +3,37 @@ import { TeamSchema, ITeam } from "./team";
 
 export interface IGame extends Document {
   _id: mongoose.Types.ObjectId;
-  hostTeam: ITeam;
-  guestTeam: ITeam;
+  black: ITeam;
+  white: ITeam;
+  moves: string[];
+  result: string;
 }
 
 const GameSchema = new Schema({
-  hostTeam: TeamSchema,
-  guestTeam: TeamSchema
+  black: {
+    type: TeamSchema,
+    ref: "Team",
+    required: true,
+    index: true
+  },
+  white: {
+    type: TeamSchema,
+    ref: "Team",
+    required: true,
+    index: true,
+    validate: [
+      function (this: IGame, value: ITeam) {
+        return this.black !== value;
+      },
+      "Cannot play game against self"
+    ]
+  },
+  moves: { type: [], required: true, default: [""] },
+  result: {
+    type: String,
+    enum: ["Black", "White", "Draw", null],
+    default: null
+  }
 });
 
 export default mongoose.model("Game", GameSchema);
