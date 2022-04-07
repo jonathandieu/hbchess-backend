@@ -7,27 +7,32 @@ import Team, { ITeam } from "../models/team";
 export const getGame = asyncHandler(
   async (req: RequestWithUser, res: Response) => {
     const user = req.user;
-    const games: IGame[] = [];
+    let allGames: IGame[] = [];
 
     if (user !== undefined) {
-      const teams = Team.find({ user });
+      const teams: ITeam[] = await Team.find({
+        $or: [{ sender: user }, { recipient: user }]
+      });
 
-      for (const team in teams) {
-        const game = await Game.findOne({
-          $or: [{ white: team }, { black: team }]
-        });
-
-        if (game) {
-          games.push(game);
-        }
-      }
+      await Promise.all(
+        teams.map(async (team) => {
+          const games: IGame[] = await Game.find({
+            $or: [{ white: team }, { black: team }]
+          });
+          if (games) {
+            allGames = [...allGames, ...games];
+          }
+        })
+      );
     } else {
       res.status(401);
       throw new Error("Invalid token");
     }
 
-    if (games) res.status(200).json(games);
-    else res.status(204).json();
+    if (allGames) {
+      res.status(200);
+      res.json(allGames);
+    } else res.status(204).json([]);
   }
 );
 

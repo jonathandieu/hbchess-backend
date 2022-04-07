@@ -13,14 +13,12 @@ const GameSchema = new Schema({
   black: {
     type: TeamSchema,
     ref: "Team",
-    required: true,
-    index: true
+    required: true
   },
   white: {
     type: TeamSchema,
     ref: "Team",
     required: true,
-    index: true,
     validate: [
       function (this: IGame, value: ITeam) {
         return this.black !== value;
@@ -28,7 +26,7 @@ const GameSchema = new Schema({
       "Cannot play game against self"
     ]
   },
-  moves: { type: [], required: true, default: [""] },
+  moves: { type: [String], required: true, default: [] },
   result: {
     type: String,
     enum: ["Black", "White", "Draw", null],
