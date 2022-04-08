@@ -4,6 +4,18 @@ import http from "http";
 import "dotenv/config";
 import consola from "consola";
 
+class Game {
+  userIds: Array<string>;
+  playerTurn: number;
+  moves: Array<string>;
+
+  constructor() {
+    this.userIds = [];
+    this.playerTurn = 0;
+    this.moves = [];
+  }
+}
+
 const socket = async (httpServer: http.Server) => {
   const io = new Server(httpServer, {
     cors: {
@@ -17,22 +29,31 @@ const socket = async (httpServer: http.Server) => {
 
   io.use(verifySocket);
 
+  const games = new Map();
+
   io.on("connection", (socket) => {
     consola.log("New Socket connected: ", socket.id);
 
     socket.on("join_game", async (message, callback) => {
       consola.log("New User joining room: ", message.roomId);
-      const connectedSockets = io.sockets.adapter.rooms.get(message.roomId);
       const socketRooms = Array.from(socket.rooms.values()).filter(
         (r) => r !== socket.id
       );
 
-      if (
-        socketRooms.length > 0 ||
-        (connectedSockets && connectedSockets.size === 4)
-      ) {
+      if (!games.has(message.roomId)) {
+        const game = new Game();
+        game.userIds = [];
+        games.set(message.roomId, game);
+      }
+
+      if (socketRooms.length > 0) {
         callback({ error: "Room is full please choose another room to play!" });
       } else {
+        await socket.join(message.roomId);
+        const game = games.get(message.roomId);
+        game.userIds.push(message.player_id);
+        games.set(message.roomId, game);
+        socket.nsp.to(message.roomId).emit("player_joined", game.userIds);
         callback("Room successfully joined.");
       }
     });
