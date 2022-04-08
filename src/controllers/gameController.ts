@@ -66,7 +66,15 @@ export const createGame = asyncHandler(
       throw new Error("Game already exists");
     }
 
-    const game: IGame = new Game({ white, black });
+    const isWhiteSenderHand = Math.random() < 0.5;
+    const isBlackSenderHand = Math.random() < 0.5;
+
+    const game: IGame = new Game({
+      white,
+      black,
+      isWhiteSenderHand,
+      isBlackSenderHand
+    });
 
     const err = game.validateSync();
     if (err) {

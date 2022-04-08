@@ -31,7 +31,9 @@ const GameSchema = new Schema({
     type: String,
     enum: ["Black", "White", "Draw", null],
     default: null
-  }
+  },
+  isWhiteSenderHand: { type: Boolean, required: true },
+  isBlackSenderHand: { type: Boolean, required: true }
 });
 
 export default mongoose.model("Game", GameSchema);
