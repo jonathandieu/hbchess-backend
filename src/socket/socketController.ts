@@ -1,9 +1,8 @@
 import { verifyToken } from "./../middlewares/authMiddleware";
 import { Server } from "socket.io";
 import http from "http";
-import { useSocketServer } from "socket-controllers";
 import "dotenv/config";
-import "reflect-metadata";
+import consola from "consola";
 
 const socket = async (httpServer: http.Server) => {
   const io = new Server(httpServer, {
@@ -18,7 +17,26 @@ const socket = async (httpServer: http.Server) => {
 
   io.use(verifySocket);
 
-  useSocketServer(io, { controllers: [__dirname + "/controllers/*.ts"] });
+  io.on("connection", (socket) => {
+    consola.log("New Socket connected: ", socket.id);
+
+    socket.on("join_game", async (message, callback) => {
+      consola.log("New User joining room: ", message.roomId);
+      const connectedSockets = io.sockets.adapter.rooms.get(message.roomId);
+      const socketRooms = Array.from(socket.rooms.values()).filter(
+        (r) => r !== socket.id
+      );
+
+      if (
+        socketRooms.length > 0 ||
+        (connectedSockets && connectedSockets.size === 4)
+      ) {
+        callback({ error: "Room is full please choose another room to play!" });
+      } else {
+        callback("Room successfully joined.");
+      }
+    });
+  });
 
   return io;
 };
