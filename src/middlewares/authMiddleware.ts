@@ -23,12 +23,10 @@ export const protect = asyncHandler(
           throw new Error("Token does not match the Bearer format");
         }
 
-        const decoded: JwtPayload | string = jwt.verify(
-          token,
-          `${process.env.JWT_SECRET}`
-        );
+        const decoded: JwtPayload | string = verifyToken(token);
+
         if (!(typeof decoded === "string")) {
-          req.user = await User.findById(decoded.id).select("-password");
+          req.user = await User.findById(decoded.id).select("");
           next();
         } else {
           res.status(401);
@@ -46,3 +44,8 @@ export const protect = asyncHandler(
     }
   }
 );
+
+export const verifyToken = (token: string) => {
+  const decoded = jwt.verify(token, `${process.env.JWT_SECRET}`);
+  return decoded;
+};

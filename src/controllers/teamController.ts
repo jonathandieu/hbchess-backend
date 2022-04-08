@@ -13,10 +13,15 @@ export const createTeam = asyncHandler(
       const recipient: IUser | null = await User.findOne({ username });
 
       if (recipient) {
+        if (recipient.isVerified === false) {
+          res.status(401);
+          throw new Error("Recipient not verified");
+        }
+
         const teamExists: ITeam | null = await Team.findOne({
           $or: [
-            { sender: sender._id, recipient: recipient._id },
-            { sender: recipient._id, recipient: sender._id }
+            { sender: sender, recipient: recipient },
+            { sender: recipient, recipient: recipient }
           ]
         });
 
@@ -31,10 +36,8 @@ export const createTeam = asyncHandler(
         }
 
         const team: ITeam = new Team({
-          sender: sender._id,
-          recipient: recipient._id,
-          senderUsername: sender.username,
-          recipientUsername: recipient.username
+          sender,
+          recipient
         });
 
         const err = team.validateSync();
@@ -54,7 +57,9 @@ export const createTeam = asyncHandler(
       throw new Error("Invalid token");
     }
 
-    res.status(201).json();
+    res.status(201).json({
+      message: "Team invite sent"
+    });
   }
 );
 
@@ -63,17 +68,19 @@ export const getTeam = asyncHandler(
     const { user } = req;
 
     if (user) {
-      const { id } = user;
-
       const team = await Team.find({
-        $or: [{ sender: id }, { recipient: id }],
+        $or: [{ sender: user }, { recipient: user }],
         accepted: true
-      });
+      }).select(
+        "-sender.password -sender.email -recipient.password -recipient.email"
+      );
 
       const teamNot = await Team.find({
-        $or: [{ sender: id }, { recipient: id }],
+        $or: [{ sender: user }, { recipient: user }],
         accepted: false
-      });
+      }).select(
+        "-sender.password -sender.email -recipient.password -recipient.email"
+      );
 
       if (team || teamNot) {
         res.status(200).json({ team, teamNot });
@@ -95,11 +102,10 @@ export const acceptTeam = asyncHandler(
       const { username } = req.body;
       const sender: IUser | null = await User.findOne({ username });
 
-      // Check for friend email validation?
       if (sender) {
         const team: ITeam | null = await Team.findOne({
-          sender: sender._id,
-          recipient: recipient._id
+          sender,
+          recipient
         });
 
         if (!team) {
@@ -130,7 +136,9 @@ export const acceptTeam = asyncHandler(
       res.status(401);
       throw new Error("Invalid token");
     }
-    res.status(200).json();
+    res.status(201).json({
+      message: "Team invite accepted"
+    });
   }
 );
 
@@ -141,7 +149,10 @@ export const allTeam = asyncHandler(async (req: Request, res: Response) => {
     const team = await Team.find({ accepted: true })
       .sort({ wins: "desc" })
       .skip(+offset)
-      .limit(+limit);
+      .limit(+limit)
+      .select(
+        "-sender.password -sender.email -recipient.password -recipient.email"
+      );
 
     if (team) res.status(200).json(team);
     else res.status(204).json();

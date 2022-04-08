@@ -7,6 +7,8 @@
     "outDir": "build",
     "strict": true,
     "alwaysStrict": true,
-    "declaration": true // Generate d.ts files
+    "declaration": true, // Generate d.ts files
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   }
 }

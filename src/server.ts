@@ -1,13 +1,16 @@
 /* eslint-disable no-console */
-import app from "./setUpServer";
+import { app, httpServer } from "./setUpServer";
 import connectDB from "./db";
 
 connectDB();
 
-const port = process.env.PORT || 8080; // Listening port defaults to 8080 if there's no env port
+const apiPort = process.env.PORT || 8080; // Listening port defaults to 8080 if there's no env port
 // Start express server
-app.listen(port, () => {
-  console.log(`server started at http://localhost:${port}`);
+app.listen(apiPort, () => {
+  console.log(`server started at http://localhost:${apiPort}`);
 });
 
-export default app;
+const wsPort = process.env.WS_PORT || 65080;
+httpServer.listen(wsPort, () => {
+  console.log(`Api and Socket.io listening on port ${wsPort}!`);
+});
