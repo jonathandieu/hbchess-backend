@@ -42,7 +42,6 @@ const socket = async (httpServer: http.Server) => {
 
       if (!games.has(message.roomId)) {
         const game = new Game();
-        game.userIds = [];
         games.set(message.roomId, game);
       }
 
@@ -51,7 +50,11 @@ const socket = async (httpServer: http.Server) => {
       } else {
         await socket.join(message.roomId);
         const game = games.get(message.roomId);
-        game.userIds.push(message.player_id);
+
+        if (!game.userIds.includes(message.player_id)) {
+          game.userIds.push(message.player_id);
+        }
+
         games.set(message.roomId, game);
         socket.nsp.to(message.roomId).emit("player_joined", game.userIds);
         callback("Room successfully joined.");
