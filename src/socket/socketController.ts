@@ -3,17 +3,26 @@ import { Server } from "socket.io";
 import http from "http";
 import "dotenv/config";
 import consola from "consola";
+import game from "../models/game";
+import { moveMessagePortToContext } from "worker_threads";
 
 class Game {
   userIds: Array<string>;
   playerTurn: number;
   moves: Array<string>;
+  pieces: Array<string>;
 
   constructor() {
     this.userIds = [];
     this.playerTurn = 0;
     this.moves = [];
+    this.pieces = [];
   }
+}
+
+export interface SocketData {
+  deltaTime: number;
+  turn: string;
 }
 
 const socket = async (httpServer: http.Server) => {
@@ -59,6 +68,32 @@ const socket = async (httpServer: http.Server) => {
         socket.nsp.to(message.roomId).emit("player_joined", game.userIds);
         callback("Room successfully joined.");
       }
+    });
+
+    socket.on("send_move", async (message) => {
+      const { roomId, move } = message;
+
+      const game = games.get(roomId);
+
+      if (game) {
+        game.moves.push(move);
+        games.set(roomId, game);
+      }
+
+      socket.to(roomId).emit("sentMove", move);
+    });
+
+    socket.on("pick_piece", async (message) => {
+      const { roomId, piece } = message;
+
+      const game = games.get(roomId);
+
+      if (game) {
+        game.moves.push(piece);
+        games.set(roomId, game);
+      }
+
+      socket.to(roomId).emit("piecePicked", piece);
     });
   });
 
