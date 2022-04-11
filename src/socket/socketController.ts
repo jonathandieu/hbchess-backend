@@ -3,8 +3,6 @@ import { Server } from "socket.io";
 import http from "http";
 import "dotenv/config";
 import consola from "consola";
-import game from "../models/game";
-import { moveMessagePortToContext } from "worker_threads";
 
 class Game {
   userIds: Array<string>;
@@ -85,13 +83,6 @@ const socket = async (httpServer: http.Server) => {
 
     socket.on("pick_piece", async (message) => {
       const { roomId, piece } = message;
-
-      const game = games.get(roomId);
-
-      if (game) {
-        game.moves.push(piece);
-        games.set(roomId, game);
-      }
 
       socket.to(roomId).emit("piecePicked", piece);
     });
