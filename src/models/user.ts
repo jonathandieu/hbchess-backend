@@ -14,7 +14,6 @@ export const UserSchema = new Schema({
   email: {
     type: String,
     trim: true,
-    unique: true,
     required: [true, "Email address is required"],
     validate: [
       function (v: string) {
@@ -23,7 +22,7 @@ export const UserSchema = new Schema({
       "Please fill a valid email address"
     ]
   },
-  username: { type: String, trim: true, unique: true, required: true },
+  username: { type: String, trim: true, required: true },
   password: {
     type: String,
     required: true,
