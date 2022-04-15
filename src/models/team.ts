@@ -6,9 +6,9 @@ export interface ITeam extends Document {
   sender: IUser;
   recipient: IUser;
   matches: number;
-  wins: number;
-  losses: number;
-  ties: number;
+  wins: mongoose.Types.ObjectId[];
+  losses: mongoose.Types.ObjectId[];
+  ties: mongoose.Types.ObjectId[];
   name: string;
   accepted: boolean;
 }
@@ -27,9 +27,9 @@ export const TeamSchema = new Schema({
     ]
   },
   matches: { type: Number, required: true, default: 0 },
-  wins: { type: Number, required: true, default: 0 },
-  losses: { type: Number, required: true, default: 0 },
-  ties: { type: Number, required: true, default: 0 },
+  wins: { type: [mongoose.Types.ObjectId], required: true, default: 0 },
+  losses: { type: [mongoose.Types.ObjectId], required: true, default: 0 },
+  ties: { type: [mongoose.Types.ObjectId], required: true, default: 0 },
   name: { type: String, required: true, default: "Everything is Team Name" },
   accepted: { type: Boolean, required: true, default: false }
 });

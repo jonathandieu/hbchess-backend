@@ -3,18 +3,15 @@ import { Server } from "socket.io";
 import http from "http";
 import "dotenv/config";
 import consola from "consola";
+import { saveGame } from "../controllers/gameController";
 
-class Game {
+export class SocketGame {
   userIds: Array<string>;
-  playerTurn: number;
   moves: Array<string>;
-  pieces: Array<string>;
 
   constructor() {
     this.userIds = [];
-    this.playerTurn = 0;
     this.moves = [];
-    this.pieces = [];
   }
 }
 
@@ -48,7 +45,7 @@ const socket = async (httpServer: http.Server) => {
       );
 
       if (!games.has(message.roomId)) {
-        const game = new Game();
+        const game = new SocketGame();
         games.set(message.roomId, game);
       }
 
@@ -85,6 +82,16 @@ const socket = async (httpServer: http.Server) => {
       const { roomId, piece } = message;
 
       socket.to(roomId).emit("piecePicked", piece);
+    });
+
+    socket.on("game_end", async (message) => {
+      const { roomId, black, white, winner, gameId } = message;
+
+      const socketGame: SocketGame | null = games.get(roomId);
+
+      if (socketGame) saveGame(socketGame, black, white, winner, gameId);
+
+      socket.to(roomId).emit("gameEnd", winner);
     });
   });
 

@@ -7,6 +7,8 @@ export interface IGame extends Document {
   white: ITeam;
   moves: string[];
   result: string;
+  isWhiteSenderHand: boolean;
+  isBlackSenderHand: boolean;
 }
 
 const GameSchema = new Schema({

@@ -3,6 +3,8 @@ import { RequestWithUser } from "../middlewares/authMiddleware";
 import asyncHandler from "express-async-handler";
 import Game, { IGame } from "../models/game";
 import Team, { ITeam } from "../models/team";
+import { SocketGame } from "../socket/socketController";
+import mongoose from "mongoose";
 
 export const getGame = asyncHandler(
   async (req: RequestWithUser, res: Response) => {
@@ -39,7 +41,6 @@ export const getGame = asyncHandler(
 export const createGame = asyncHandler(
   async (req: RequestWithUser, res: Response) => {
     const { whiteId, blackId } = req.body;
-    const { user } = req;
 
     const white: ITeam | null = await Team.findById(whiteId);
     const black: ITeam | null = await Team.findById(blackId);
@@ -56,8 +57,8 @@ export const createGame = asyncHandler(
 
     const gameExists = await Game.findOne({
       $or: [
-        { white: white, black: black },
-        { white: black, black: white }
+        { white: whiteId, black: blackId },
+        { white: blackId, black: whiteId }
       ]
     });
 
@@ -88,3 +89,61 @@ export const createGame = asyncHandler(
     res.status(201).json({ message: "Game created", game });
   }
 );
+
+export const saveGame = async (
+  socketGame: SocketGame,
+  black: mongoose.Types.ObjectId,
+  white: mongoose.Types.ObjectId,
+  winner: string,
+  gameId: mongoose.Types.ObjectId
+) => {
+  const teamWhite: ITeam | null = await Team.findOne({
+    _id: white
+  });
+
+  const teamBlack: ITeam | null = await Team.findOne({
+    _id: black
+  });
+
+  if (teamWhite && teamBlack) {
+    const game: IGame | null = await Game.findOne({
+      _id: gameId
+    });
+
+    if (!game) throw new Error("Game does not exists!");
+
+    game.moves = socketGame.moves;
+
+    let err = game.validateSync();
+    if (err) {
+      const message = err.toString().split(":")[2].trim();
+      throw new Error(message);
+    } else {
+      await game.save();
+    }
+
+    if (winner === "White") {
+      teamWhite.wins.push(game._id);
+      teamBlack.losses.push(game._id);
+    } else if (winner === "Black") {
+      teamWhite.losses.push(game._id);
+      teamBlack.wins.push(game._id);
+    } else {
+      teamWhite.ties.push(game._id);
+      teamBlack.ties.push(game._id);
+    }
+
+    teamWhite.matches++;
+    teamBlack.matches++;
+
+    err = teamWhite.validateSync();
+    err = teamBlack.validateSync();
+    if (err) {
+      const message = err.toString().split(":")[2].trim();
+      throw new Error(message);
+    } else {
+      await teamWhite.save();
+      await teamBlack.save();
+    }
+  }
+};
