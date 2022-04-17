@@ -57,8 +57,8 @@ export const createGame = asyncHandler(
 
     const gameExists = await Game.findOne({
       $or: [
-        { white: whiteId, black: blackId },
-        { white: blackId, black: whiteId }
+        { white: white, black: black },
+        { white: black, black: white }
       ]
     });
 
