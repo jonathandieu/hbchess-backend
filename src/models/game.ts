@@ -5,7 +5,7 @@ export interface IGame extends Document {
   _id: mongoose.Types.ObjectId;
   black: ITeam;
   white: ITeam;
-  moves: string[];
+  moves: string;
   result: string;
   isWhiteSenderHand: boolean;
   isBlackSenderHand: boolean;
@@ -28,7 +28,7 @@ const GameSchema = new Schema({
       "Cannot play game against self"
     ]
   },
-  moves: { type: [String], required: true, default: [] },
+  moves: { type: String, default: "" },
   result: {
     type: String,
     enum: ["Black", "White", "Draw", null],
