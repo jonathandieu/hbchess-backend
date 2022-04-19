@@ -110,9 +110,10 @@ export const saveGame = asyncHandler(
 
       if (!game) throw new Error("Game does not exists!");
 
-      if (!game.result) throw new Error("Game has already ended!");
+      if (game.result) throw new Error("Game has already ended!");
 
       game.moves = moves;
+      game.result = winner;
 
       let err = game.validateSync();
       if (err) {
