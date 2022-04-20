@@ -16,6 +16,6 @@ router.get("/verify-user", verifyUser);
 router.post("/login", loginUser);
 router.get("/user", protect, getUser);
 router.get("/search", protect, searchUser);
-router.put("/changePassword", protect, changePasswordUser);
+router.put("/changePassword", changePasswordUser);
 
 export default router;

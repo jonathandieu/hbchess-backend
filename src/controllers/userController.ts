@@ -151,35 +151,31 @@ export const searchUser = asyncHandler(
 
 export const changePasswordUser = asyncHandler(
   async (req: RequestWithUser, res: Response) => {
-    const { password, newPassword } = req.body;
-    const { user } = req;
+    const { username, password, newPassword } = req.body;
 
-    if (user) {
-      const { username } = user;
-      const upUser = await User.findOne({
-        username
-      });
+    const user = await User.findOne({
+      username
+    });
 
-      if (upUser && (await bcrypt.compare(password, user.password))) {
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(newPassword, salt);
+    if (user && (await bcrypt.compare(password, user.password))) {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-        upUser.password = hashedPassword;
+      user.password = hashedPassword;
 
-        const err = upUser.validateSync();
-        if (err) {
-          res.status(400);
-          const message = err.toString().split(":")[2].trim();
-          throw new Error(message);
-        } else {
-          await upUser.save();
-        }
-      } else {
+      const err = user.validateSync();
+      if (err) {
         res.status(400);
-        throw new Error("Invalid credentials");
+        const message = err.toString().split(":")[2].trim();
+        throw new Error(message);
+      } else {
+        await user.save();
       }
-      res.status(200).json({ message: "Password successfully updated." });
+    } else {
+      res.status(400);
+      throw new Error("Invalid credentials");
     }
+    res.status(200).json({ message: "Password successfully updated." });
   }
 );
 
