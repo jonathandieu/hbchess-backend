@@ -162,27 +162,3 @@ export const allTeam = asyncHandler(async (req: Request, res: Response) => {
     throw new Error("Provide limit and/or offset");
   }
 });
-
-export const getGamesTeam = asyncHandler(
-  async (req: RequestWithUser, res: Response) => {
-    //const allTeamGames: ITeam[] = [];
-    const { user } = req;
-
-    if (user !== undefined) {
-      const teams: ITeam[] = await Team.find({
-        $or: [{ sender: user._id }, { recipient: user._id }]
-      })
-        .populate({ path: "sender", select: "_id username" })
-        .populate({ path: "recipient", select: "_id username" })
-        .populate([{ path: "matches", options: { limit: 5 } }]);
-
-      if (teams) {
-        res.status(200);
-        res.json(teams);
-      } else res.status(204).json([]);
-    } else {
-      res.status(401);
-      throw new Error("Invalid token");
-    }
-  }
-);

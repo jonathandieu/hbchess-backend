@@ -8,6 +8,8 @@ export interface IGame extends Document {
   result: string;
   isWhiteSenderHand: boolean;
   isBlackSenderHand: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const GameSchema = new Schema({
@@ -37,4 +39,5 @@ const GameSchema = new Schema({
   isBlackSenderHand: { type: Boolean, required: true }
 });
 
+GameSchema.set("timestamps", true);
 export default mongoose.model("Game", GameSchema);

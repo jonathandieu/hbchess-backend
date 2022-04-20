@@ -187,3 +187,54 @@ export const saveGame = asyncHandler(
     }
   }
 );
+
+export const getFinishedGames = asyncHandler(
+  async (req: RequestWithUser, res: Response) => {
+    const { user } = req;
+    let allGames: IGame[] = [];
+
+    if (user !== undefined) {
+      const teams: ITeam[] = await Team.find({
+        $or: [{ sender: user._id }, { recipient: user._id }]
+      });
+
+      await Promise.all(
+        teams.map(async (team) => {
+          const games: IGame[] = await Game.find({
+            $and: [
+              { result: { $ne: null } },
+              { $or: [{ white: team._id }, { black: team._id }] }
+            ]
+          })
+            .sort({ updatedAt: "desc" })
+            .limit(5)
+            .populate({
+              path: "black",
+              populate: [
+                { path: "sender", select: "_id username" },
+                { path: "recipient", select: "_id username" }
+              ]
+            })
+            .populate({
+              path: "white",
+              populate: [
+                { path: "sender", select: "_id username" },
+                { path: "recipient", select: "_id username" }
+              ]
+            });
+          if (games) {
+            allGames = [...allGames, ...games];
+          }
+        })
+      );
+
+      if (allGames) {
+        res.status(200);
+        res.json(allGames);
+      } else res.status(204).json([]);
+    } else {
+      res.status(401);
+      throw new Error("Invalid token");
+    }
+  }
+);
