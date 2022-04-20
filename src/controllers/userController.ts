@@ -149,6 +149,40 @@ export const searchUser = asyncHandler(
   }
 );
 
+export const changePasswordUser = asyncHandler(
+  async (req: RequestWithUser, res: Response) => {
+    const { password, newPassword } = req.body;
+    const { user } = req;
+
+    if (user) {
+      const { username } = user;
+      const upUser = await User.findOne({
+        username
+      });
+
+      if (upUser && (await bcrypt.compare(password, user.password))) {
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        upUser.password = hashedPassword;
+
+        const err = upUser.validateSync();
+        if (err) {
+          res.status(400);
+          const message = err.toString().split(":")[2].trim();
+          throw new Error(message);
+        } else {
+          await upUser.save();
+        }
+      } else {
+        res.status(400);
+        throw new Error("Invalid credentials");
+      }
+      res.status(200).json({ message: "Password successfully updated." });
+    }
+  }
+);
+
 const generateToken = (
   id: mongoose.Types.ObjectId,
   username: string,
