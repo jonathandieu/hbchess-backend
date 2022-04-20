@@ -26,7 +26,7 @@ export const protect = asyncHandler(
         const decoded: JwtPayload | string = verifyToken(token);
 
         if (!(typeof decoded === "string")) {
-          req.user = await User.findById(decoded.id).select("");
+          req.user = await User.findById(decoded.id).select("-password");
           next();
         } else {
           res.status(401);

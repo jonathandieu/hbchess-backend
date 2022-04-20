@@ -126,8 +126,6 @@ export const getUser = asyncHandler(
   async (req: RequestWithUser, res: Response) => {
     const { user } = req;
 
-    if (user) user.password = "";
-
     res.json({ user });
   }
 );
