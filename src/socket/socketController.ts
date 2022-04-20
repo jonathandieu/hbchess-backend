@@ -3,7 +3,6 @@ import { Server } from "socket.io";
 import http from "http";
 import "dotenv/config";
 import consola from "consola";
-import { saveGame } from "../controllers/gameController";
 
 export class SocketGame {
   userIds: Array<string>;
@@ -84,15 +83,15 @@ const socket = async (httpServer: http.Server) => {
       socket.to(roomId).emit("piecePicked", piece);
     });
 
-    socket.on("game_end", async (message) => {
-      const { roomId, black, white, winner, gameId } = message;
+    // socket.on("game_end", async (message) => {
+    //   const { roomId, black, white, winner, gameId } = message;
 
-      const socketGame: SocketGame | null = games.get(roomId);
+    //   const socketGame: SocketGame | null = games.get(roomId);
 
-      if (socketGame) saveGame(socketGame, black, white, winner, gameId);
+    //   if (socketGame) saveGame(socketGame, black, white, winner, gameId);
 
-      socket.to(roomId).emit("gameEnd", winner);
-    });
+    //   socket.to(roomId).emit("gameEnd", winner);
+    // });
   });
 
   return io;
