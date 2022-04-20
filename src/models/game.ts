@@ -1,29 +1,30 @@
 import mongoose, { Schema, Document } from "mongoose";
-import { TeamSchema, ITeam } from "./team";
 
 export interface IGame extends Document {
   _id: mongoose.Types.ObjectId;
-  black: ITeam;
-  white: ITeam;
-  moves: string;
+  black: mongoose.Types.ObjectId;
+  white: mongoose.Types.ObjectId;
+  moves: string[];
   result: string;
   isWhiteSenderHand: boolean;
   isBlackSenderHand: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const GameSchema = new Schema({
   black: {
-    type: TeamSchema,
+    type: mongoose.Types.ObjectId,
     ref: "Team",
     required: true
   },
   white: {
-    type: TeamSchema,
+    type: mongoose.Types.ObjectId,
     ref: "Team",
     required: true,
     validate: [
-      function (this: IGame, value: ITeam) {
-        return this.black !== value;
+      function (this: IGame, value: mongoose.Types.ObjectId) {
+        return this.black._id !== value;
       },
       "Cannot play game against self"
     ]
@@ -38,4 +39,5 @@ const GameSchema = new Schema({
   isBlackSenderHand: { type: Boolean, required: true }
 });
 
+GameSchema.set("timestamps", true);
 export default mongoose.model("Game", GameSchema);

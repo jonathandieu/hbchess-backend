@@ -20,8 +20,8 @@ export const createTeam = asyncHandler(
 
         const teamExists: ITeam | null = await Team.findOne({
           $or: [
-            { sender: sender, recipient: recipient },
-            { sender: recipient, recipient: recipient }
+            { sender: sender._id, recipient: recipient._id },
+            { sender: recipient._id, recipient: recipient._id }
           ]
         });
 
@@ -36,8 +36,8 @@ export const createTeam = asyncHandler(
         }
 
         const team: ITeam = new Team({
-          sender,
-          recipient
+          sender: sender._id,
+          recipient: recipient._id
         });
 
         const err = team.validateSync();
@@ -69,18 +69,20 @@ export const getTeam = asyncHandler(
 
     if (user) {
       const team = await Team.find({
-        $or: [{ sender: user }, { recipient: user }],
+        $or: [{ sender: user._id }, { recipient: user._id }],
         accepted: true
-      }).select(
-        "-sender.password -sender.email -recipient.password -recipient.email"
-      );
+      })
+        .sort({ wins: "desc" })
+        .populate({ path: "sender", select: "_id username" })
+        .populate({ path: "recipient", select: "_id username" });
 
       const teamNot = await Team.find({
-        $or: [{ sender: user }, { recipient: user }],
+        $or: [{ sender: user._id }, { recipient: user._id }],
         accepted: false
-      }).select(
-        "-sender.password -sender.email -recipient.password -recipient.email"
-      );
+      })
+        .sort({ wins: "desc" })
+        .populate({ path: "sender", select: "_id username" })
+        .populate({ path: "recipient", select: "_id username" });
 
       if (team || teamNot) {
         res.status(200).json({ team, teamNot });
@@ -104,8 +106,8 @@ export const acceptTeam = asyncHandler(
 
       if (sender) {
         const team: ITeam | null = await Team.findOne({
-          sender,
-          recipient
+          sender: sender._id,
+          recipient: recipient._id
         });
 
         if (!team) {
@@ -150,9 +152,8 @@ export const allTeam = asyncHandler(async (req: Request, res: Response) => {
       .sort({ wins: "desc" })
       .skip(+offset)
       .limit(+limit)
-      .select(
-        "-sender.password -sender.email -recipient.password -recipient.email"
-      );
+      .populate({ path: "sender", select: "_id username" })
+      .populate({ path: "recipient", select: "_id username" });
 
     if (team) res.status(200).json(team);
     else res.status(204).json();
