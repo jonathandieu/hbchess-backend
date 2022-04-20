@@ -25,7 +25,12 @@ export const TeamSchema = new Schema({
       "Please fill a valid email address"
     ]
   },
-  matches: { type: Number, required: true, default: 0 },
+  matches: {
+    type: [mongoose.Types.ObjectId],
+    ref: "Game",
+    required: true,
+    default: []
+  },
   wins: {
     type: [mongoose.Types.ObjectId],
     ref: "Game",
