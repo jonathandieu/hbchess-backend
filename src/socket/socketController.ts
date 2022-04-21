@@ -83,6 +83,12 @@ const socket = async (httpServer: http.Server) => {
       socket.to(roomId).emit("piecePicked", piece);
     });
 
+    socket.on("send_emoji", async (message) => {
+      const { roomId, emoji } = message;
+
+      socket.to(roomId).emit("sentEmoji", emoji);
+    });
+
     // socket.on("game_end", async (message) => {
     //   const { roomId, black, white, winner, gameId } = message;
 
