@@ -21,7 +21,7 @@ export const createTeam = asyncHandler(
         const teamExists: ITeam | null = await Team.findOne({
           $or: [
             { sender: sender._id, recipient: recipient._id },
-            { sender: recipient._id, recipient: recipient._id }
+            { sender: recipient._id, recipient: sender._id }
           ]
         });
 
