@@ -46,7 +46,7 @@ export const getGame = asyncHandler(
       throw new Error("Invalid token");
     }
 
-    if (allGames.length !== 0) {
+    if (allGames) {
       res.status(200);
       res.json(allGames);
     } else res.status(204).json([]);
@@ -228,7 +228,7 @@ export const getFinishedGames = asyncHandler(
         })
       );
 
-      if (allGames.length !== 0) {
+      if (allGames) {
         res.status(200);
         res.json(allGames);
       } else res.status(204).json([]);
