@@ -147,19 +147,71 @@ export const searchUser = asyncHandler(
   }
 );
 
-export const changePasswordUser = asyncHandler(
-  async (req: RequestWithUser, res: Response) => {
-    const { username, password, newPassword } = req.body;
+export const forgotPasswordUser = asyncHandler(
+  async (req: Request, res: Response) => {
+    const { email } = req.body;
 
     const user = await User.findOne({
-      username
+      email
     });
 
-    if (user && (await bcrypt.compare(password, user.password))) {
+    if (user) {
+      user.emailToken = crypto.randomBytes(64).toString("hex");
+
+      const url =
+        process.env.NODE_ENV === "production"
+          ? `https://hbchess.app/auth/resetPassword?emailToken=${user.emailToken}`
+          : `http://localhost:3000/auth/resetPassword?emailToken=${user.emailToken}`;
+      const msg = {
+        to: user.email,
+        from: `${process.env.SEND_GRID_SENDER}`,
+        subject: `Password reset`,
+        text: `
+        A password reset has been requested for ${user.username}.
+        Copy and paste the address below to reset your password.
+        ${url}
+      `,
+        html: `
+        <h1> A password reset has been requested for ${user.username}.</h1>
+        <p>Click the link below to reset your password.</a>
+        <a href="${url}">Reset password</a>
+      `
+      };
+      sgMail.send(msg);
+
+      const err = user.validateSync();
+      if (err) {
+        res.status(400);
+        const message = err.toString().split(":")[2].trim();
+        throw new Error(message);
+      } else {
+        await user.save();
+      }
+
+      res.status(201).json({
+        message: "Password Reset Sent"
+      });
+    } else {
+      res.status(400);
+      throw new Error("Invalid email");
+    }
+  }
+);
+
+export const resetPasswordUser = asyncHandler(
+  async (req: RequestWithUser, res: Response) => {
+    const { emailToken, password } = req.body;
+
+    const user = await User.findOne({
+      emailToken
+    });
+
+    if (user) {
       const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(newPassword, salt);
+      const hashedPassword = await bcrypt.hash(password, salt);
 
       user.password = hashedPassword;
+      user.emailToken = "";
 
       const err = user.validateSync();
       if (err) {
@@ -171,7 +223,7 @@ export const changePasswordUser = asyncHandler(
       }
     } else {
       res.status(400);
-      throw new Error("Invalid credentials");
+      throw new Error("Invalid token");
     }
     res.status(200).json({ message: "Password successfully updated." });
   }
