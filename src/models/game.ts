@@ -4,7 +4,7 @@ export interface IGame extends Document {
   _id: mongoose.Types.ObjectId;
   black: mongoose.Types.ObjectId;
   white: mongoose.Types.ObjectId;
-  moves: string[];
+  moves: string;
   result: string;
   isWhiteSenderHand: boolean;
   isBlackSenderHand: boolean;
