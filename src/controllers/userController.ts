@@ -179,6 +179,15 @@ export const forgotPasswordUser = asyncHandler(
       };
       sgMail.send(msg);
 
+      const err = user.validateSync();
+      if (err) {
+        res.status(400);
+        const message = err.toString().split(":")[2].trim();
+        throw new Error(message);
+      } else {
+        await user.save();
+      }
+
       res.status(201).json({
         message: "Password Reset Sent"
       });
