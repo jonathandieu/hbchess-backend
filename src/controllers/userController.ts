@@ -202,7 +202,7 @@ export const resetPasswordUser = asyncHandler(
       const hashedPassword = await bcrypt.hash(password, salt);
 
       user.password = hashedPassword;
-      user.emailToken = '';
+      user.emailToken = "";
 
       const err = user.validateSync();
       if (err) {
