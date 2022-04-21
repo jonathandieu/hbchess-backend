@@ -5,7 +5,8 @@ import {
   verifyUser,
   getUser,
   searchUser,
-  changePasswordUser
+  forgotPasswordUser,
+  resetPasswordUser
 } from "../controllers/userController";
 import { protect } from "../middlewares/authMiddleware";
 
@@ -16,6 +17,7 @@ router.get("/verify-user", verifyUser);
 router.post("/login", loginUser);
 router.get("/user", protect, getUser);
 router.get("/search", protect, searchUser);
-router.put("/changePassword", changePasswordUser);
+router.post("/forgotPassword", forgotPasswordUser);
+router.put("/resetPassword", resetPasswordUser);
 
 export default router;
